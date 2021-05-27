@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Vaccines Administered in the United States</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css" rel="stylesheet">
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+        <style>
+            #html, #body, #map-container {
+                height: 100%;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            h2,
+            h3 {
+                margin: 10px;
+                font-size: 1.2em;
+            }
+            h4 {
+                margin: 10px;
+                font-size: 1em;
+            }
+            p {
+                font-size: 0.85em;
+                margin: 10px;
+                text-align: left;
+            }
+            .map-overlay {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.8);
+                margin-right: 20px;
+                font-family: Arial, sans-serif;
+                overflow: auto;
+                border-radius: 3px;
+            }
+            #map {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 100%;
+                }
+            #features {
+                top: 0;
+                height: 150px;
+                margin-top: 20px;
+                margin-left: 5px;
+                width: 250px;
+            }
+            #legend {
+                padding: 10px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                line-height: 18px;
+                height: 100px;
+                margin-bottom: 40px;
+                width: 100px;
+            }
+            .legend-key {
+                display: inline-block;
+                border-radius: 20%;
+                width: 10px;
+                height: 10px;
+                margin-right: 5px;
+            }
+            body {
+            overflow: hidden;
+            }
+            
+            body * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            }
+        </style>
+    </head>
+    <body>   
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css" type="text/css">
+    <div id="map"></div>
+    <div id="comparison-container">
+    <div id="before" class="map"></div>
+    <div id="after" class="map"></div>
+    <div class="map-overlay" id="legend"></div>
+    <div class="mapboxgl-ctrl-bottom-left">
+        <div class="mapboxgl-ctrl"><a class="mapboxgl-ctrl-logo" target="_blank" href="https://www.mapbox.com/" aria-label="Mapbox logo"></a></div>
+    </div>
+    <div class="mapboxgl-ctrl-bottom-right">
+        <div class="mapboxgl-ctrl mapboxgl-ctrl-attrib"><a href="https://covid.cdc.gov/covid-data-tracker/#vaccinations" target="_blank">CDC</a></div>
+    </div>
+        <script>
+        mapboxgl.accessToken = "pk.eyJ1IjoicGNhcmV3ODgiLCJhIjoiY2tsb2R2eG51MGE4NDJ2bGg0ZWE5Y3MzaiJ9.oplWrmagYgAUgVIcNyti7A";
+               
+        var afterMap = new mapboxgl.Map({
+            container: 'after',
+            style: 'mapbox://styles/pcarew88/ckp3i0o430m4x17mzin7t1knq',
+            center: [-98.00337824639475,40.46151464591031],
+            zoom: 3
+        });
+        // console.log(afterMap)
+
+        var beforeMap = new mapboxgl.Map({
+            container: 'before',
+            style: 'mapbox://styles/pcarew88/cklodo87p5owo18nx49hn70th',
+            center: [-98.00337824639475,40.46151464591031],
+            zoom: 3
+        });
+        // console.log(beforeMap)
+        beforeMap.on('load', function() {
+            beforeMap.addSource('covid19vaccines-a02nry', {
+                type: 'vector',
+                url: "mapbox://pcarew88.7s4lns78"
+                });
+            beforeMap.addLayer({
+                id: "covid19vacciness-fill",
+                source: "covid19vaccines-a02nry",
+                'source-layer': 'covid19vaccines-a02nry',
+                type: "fill",
+                paint: {
+                    "fill-color": [
+                    "match",
+                    ["get", "COVID19V_6"],
+                    "51-59%",
+                    "#ebfb93", 
+                    "60-68%",
+                    "#91eeca", 
+                    "69-77%",
+                    "#2ec2d6", 
+                    "78-86%",
+                    "#1b40e4", 
+                    ">86%",
+                    "#29098b",
+                    "#ccc"	
+                ]}});
+                });
+        
+        afterMap.on('load', function() {
+            afterMap.addSource('Percent_of_Total_Pop_Fully_Va-cqgis0', {
+                type: 'vector',
+                url: "mapbox://pcarew88.ctpd20k4"
+                });
+            afterMap.addLayer({
+                id: "Percent_of_Total_Pop_Fully_Va-cqgis0-fill",
+                source: "Percent_of_Total_Pop_Fully_Va-cqgis0",
+                'source-layer': 'Percent_of_Total_Pop_Fully_Va-cqgis0',
+                type: "fill",
+                paint: {
+                    "fill-color": [
+                    "match",
+                    ["get", "COVID19V14"],
+                    "69-77%",
+                    "#2ec2d6", 
+                    "78-86%",
+                    "#1b40e4", 
+                    ">86%",
+                    "#29098b",
+                    "#ccc"	
+                ]}});
+                });
+
+        // A selector or reference to HTML element
+        var container = '#comparison-container';
+        
+        var map = new mapboxgl.Compare(beforeMap, afterMap, container, {
+        });
+        // console.log(map)
+
+        var layers = [
+         '51-60',
+         '61-69',
+         '70-76',
+         '77-86',
+         '86+'
+         ];
+         var colors = [
+         '#ebfb93',
+         '#91eeca',
+         '#2ec2d6',
+         '#1b40e4',
+         '#29098b'
+         ];
+         
+         // create legend
+         for (i = 0; i < layers.length; i++) {
+            var layer = layers[i];
+            var color = colors[i];
+            var item = document.createElement('div');
+            var key = document.createElement('span');
+            key.className = 'legend-key';
+            key.style.backgroundColor = color;
+         
+            var value = document.createElement('span');
+            value.innerHTML = layer;
+            item.appendChild(key);
+            item.appendChild(value);
+            legend.appendChild(item);
+         }
+        </script>
+    
+    </body>
+</html>
